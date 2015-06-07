@@ -19,7 +19,28 @@ asciiToSixBit <- function(asciiIn) {
 }
 
 nmeaToBin <- function(nmeaIn) {
+  # Converts the ASCII portion of a NMEA message to 6-bit binned binary.
+  
   nmeaIn <- as.character(nmeaIn)
   splitNMEA <- unlist(strsplit(nmeaIn, split = ""))
   as.numeric(sapply(splitNMEA, FUN = asciiToSixBit))
+}
+
+binToDec <- function(binVec, startInd, endInd) {
+  strtoi(paste0(binVec[startInd:endInd], collapse = ""), base = 2)
+}
+
+posRepParse <- function(posRep) {
+  # Takes as input a binary AIS message such as that returned by nmeaToBin.
+  
+  MessageID <- binToDec(posRep, 1, 6)
+  RepInd <- binToDec(posRep, 7, 8)
+  MMSI <- binToDec(posRep, 9, 38)
+  NavStatus <- binToDec(posRep, 39, 42)
+  ROT <- binToDec(posRep, 43, 50) # Correct this - this is signed binary
+  SOG <- binToDec(posRep, 51, 60)
+  PosAcc <- binToDec(posRep, 61, 61)
+  
+  
+  list(MessageID, RepInd, MMSI, NavStatus, ROT, SOG, PosAcc)
 }
